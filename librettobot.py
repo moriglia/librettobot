@@ -8,6 +8,7 @@ token = input()
 db_path = input()
 local_host = input()
 port = int(input())
+laude_plus = 0  # TODO: make this customizable
 
 librettobot = Bot(token=token, database_url=db_path)
 markregex = re.compile(
@@ -62,6 +63,25 @@ async def voto(bot, update, user_record):
         )
 
     return "Voto inserito!"
+
+
+@librettobot.command('/media')
+async def media(bot, update, user_record):
+    student = user_record['id']
+    with dataset.connect(f"sqlite:///{db_path}") as db:
+        marks_table = db['marks']
+        marks = marks_table.find(student=student)
+
+    s = 0
+    c = 0
+    for mark in marks:
+        c += mark['credits']
+        s += mark['credits'] * (mark['mark'] + mark['laude'] * laude_plus)
+
+    if c == 0:
+        return "Non hai ancora registrato nessun esame!"
+
+    return f"La tua media è {s/c}"
 
 status = librettobot.run(
     local_host=local_host,
