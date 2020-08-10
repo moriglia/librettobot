@@ -157,11 +157,16 @@ siano registrati su un server gestito dallo sviluppatore del bot. \
 sulla protezione dei dati inseriti</i>, tuttavia si impegna a non pubblicare \
 nessun dato se non anonimizzato o aggregato.
 
+In ogni caso puoi mettere su il tuo bot con \
+<a href="https://github.com/moriglia/librettobot">il mio codice</a> \
+(modificandolo a tuo piacere) e salvare i tuoi dati sul tuo server.
+
 Scopri come usare il bot usando l'/help"""
 
     return dict(
         text=message,
-        parse_mode='HTML'
+        parse_mode='HTML',
+        disable_web_page_preview=True
     )
 
 
