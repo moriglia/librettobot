@@ -5,3 +5,9 @@ run:
 
 install:
 		pipenv install --three
+
+pylama:
+		pylama *.py
+
+
+.PHONY: pylama

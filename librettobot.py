@@ -1,8 +1,10 @@
 from davtelepot.bot import Bot
 import re
-import dataset
+#  import dataset
 import datetime
 import sys
+import asyncio
+from utils import getmarks, displaymarks
 
 token = input()
 db_path = input()
@@ -11,9 +13,13 @@ port = int(input())
 laude_plus = 0  # TODO: make this customizable
 
 librettobot = Bot(token=token, database_url=db_path)
+
 markregex = re.compile(
-    '\/[a-z]+ ([a-zA-Z ]+)([0-9]{2})\s*(L?)\s+\
-([0-9]+)\s+([0-9]{4})-([0-9]{2})-([0-9]{2})'
+    '\/[a-z]+\s+([a-zA-Zàèéìòù ]+)\s+([0-9]{2})\s*([Ll]?)\s+\
+([0-9]+)\s+([0-9]{4})-([0-9]{1,2})-([0-9]{1,2})'
+)
+deleteregex = re.compile(
+    '\/cancella\s+([0-9]+)'
 )
 
 
@@ -47,36 +53,80 @@ async def voto(bot, update, user_record):
     try:
         date = datetime.date(year, month, day)
     except ValueError as ve:
-        return "Date format is not correct"
+        return "Voto non inserito: ricontrolla la data."
 
-    with dataset.connect(f"sqlite:///{db_path}") as db:
-        marks_table = db['marks']
-        marks_table.insert(
-            dict(
-                student=student,
-                exam=exam,
-                mark=mark,
-                laude=laude,
-                credits=credits,
-                date=date
-            )
+    student_exam_id = bot.db['marks'].count(student=student)
+
+    bot.db['marks'].insert(
+        dict(
+            student_exam_id=student_exam_id,
+            student=student,
+            exam=exam,
+            mark=mark,
+            laude=laude,
+            credits=credits,
+            date=date
         )
+    )
 
     return "Voto inserito!"
+
+
+@librettobot.command('/lista')
+async def vote_list(bot, update, user_record):
+    student = user_record['id']
+
+    if not bot.db['marks'].count(student=student):
+        return "Non hai ancora registrato nessun esame"
+
+    return await displaymarks(getmarks(bot, student))
+
+
+@librettobot.command('/cancella')
+async def delete_vote(bot, update, user_record):
+    if not bot.db['marks'].count(student=user_record['id']):
+        return "Non hai nessun esame da cancellare"
+
+    delvote = deleteregex.match(update['text'])
+
+    if delvote is None:
+        exam_list = await displaymarks(getmarks(bot, user_record['id']), True)
+        return "Quale esame vuoi cancellare?\n" + exam_list + \
+            "\n\"/cancella n\" per cancellare l'n-esimo esame della tua lista"
+
+    student_exam_id = int(delvote.group(1)) - 1
+    result = bot.db['marks'].delete(
+        student=user_record['id'],
+        student_exam_id=student_exam_id
+    )
+    if not result:
+        return f"Numero esame non corretto: {int(delvote.group(1))}"
+
+    # Rearrange exam numbering
+    for mark in bot.db.query(f"select * from marks \
+    where student={user_record['id']} \
+    and student_exam_id > {student_exam_id}"):
+        bot.db.query(
+            f"update marks \
+            set student_exam_id = {mark['student_exam_id'] - 1}\
+            where id = {mark['id']}"
+        )
+
+    exam_list = await displaymarks(getmarks(bot, user_record['id']), True)
+    return "Esame cancellato. Nuovo elenco esami:\n" + exam_list
 
 
 @librettobot.command('/media')
 async def media(bot, update, user_record):
     student = user_record['id']
-    with dataset.connect(f"sqlite:///{db_path}") as db:
-        marks_table = db['marks']
-        marks = marks_table.find(student=student)
+    marks = bot.db['marks'].find(student=student)
 
     s = 0
     c = 0
     for mark in marks:
         c += mark['credits']
         s += mark['credits'] * (mark['mark'] + mark['laude'] * laude_plus)
+        await asyncio.sleep(0)
 
     if c == 0:
         return "Non hai ancora registrato nessun esame!"
