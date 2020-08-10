@@ -133,6 +133,17 @@ async def media(bot, update, user_record):
 
     return f"La tua media è {s/c}"
 
+@librettobot.command('/help')
+async def help(bot, update, user_record):
+    message = "Comandi disponibili\n"
+    message += "/voto\n"
+    message += "/media\n"
+    message += "/lista\n"
+    message += "/cancella\n"
+    message += "Chiama un comando senza parametri per sapere come usarlo"
+
+    return message
+
 status = librettobot.run(
     local_host=local_host,
     port=port
