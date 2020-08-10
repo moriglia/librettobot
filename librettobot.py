@@ -133,6 +133,7 @@ async def media(bot, update, user_record):
 
     return f"La tua media è {s/c}"
 
+
 @librettobot.command('/help')
 async def help(bot, update, user_record):
     message = "Comandi disponibili\n"
@@ -143,6 +144,26 @@ async def help(bot, update, user_record):
     message += "Chiama un comando senza parametri per sapere come usarlo"
 
     return message
+
+
+@librettobot.command('/start')
+async def start(bot, update, user_record):
+    message = """<b>Benvenuto su Libretto Bot</b>
+
+Breve nota sulla <b>privacy</b>
+Utilizzando questo bot accetti che i voti dei tuoi esami \
+siano registrati su un server gestito dallo sviluppatore del bot. \
+<i>Lo sviluppatore del bot non si assume nessuna responsabilità \
+sulla protezione dei dati inseriti</i>, tuttavia si impegna a non pubblicare \
+nessun dato se non anonimizzato o aggregato.
+
+Scopri come usare il bot usando l'/help"""
+
+    return dict(
+        text=message,
+        parse_mode='HTML'
+    )
+
 
 status = librettobot.run(
     local_host=local_host,
