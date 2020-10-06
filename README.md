@@ -14,6 +14,9 @@ with the following content, one item per line:
   127.0.0.1
   5555
   ```
+  Remember not to track the configuration file or folder.
+  Since every programmer may choose a different name or location, I suggest
+  to add it to `.git/info/exclude` rather than to `.gitignore`.
 
 2. Install required modules
 
