@@ -1,0 +1,13 @@
+version: '2.3'
+
+services:
+  librettobot:
+    build: .
+    restart: always
+    image: moriglia/librettobot:0.1
+    # environment vars automatically picked from ".env" file. See ".env.sample"
+    environment:
+            - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
+    volumes:
+            - ./data:/data
+
