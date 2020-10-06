@@ -1,6 +1,5 @@
 from davtelepot.bot import Bot
 import re
-#  import dataset
 import datetime
 import sys
 import asyncio

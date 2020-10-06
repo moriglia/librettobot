@@ -10,4 +10,4 @@ pylama:
 		pylama *.py
 
 
-.PHONY: pylama
+.PHONY: run install pylama
