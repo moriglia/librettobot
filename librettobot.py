@@ -1,15 +1,36 @@
 from davtelepot.bot import Bot
 import re
-#  import dataset
 import datetime
 import sys
 import asyncio
+import argparse
 from utils import getmarks, displaymarks
 
-token = input()
-db_path = input()
-local_host = input()
-port = int(input())
+parser = argparse.ArgumentParser(description="Start LibrettoBot!")
+parser.add_argument("--token", "-t", help="Telegram Bot Token, \
+skipped if --config is specified")
+parser.add_argument("--dbpath", "-d", help="Path to database \
+skipped if --config is specified")
+parser.add_argument("--localhost", "-l", help="Local IP to use \
+skipped if --config is specified")
+parser.add_argument("--port", "-p", help="Port to listen from \
+skipped if --config is specified", type=int)
+parser.add_argument("--config", "-c", help="Load configuration file")
+
+args = parser.parse_args()
+
+if args.config:
+    with open(args.config, 'r') as config_fd:
+        token = config_fd.readline().strip()
+        db_path = config_fd.readline().strip()
+        local_host = config_fd.readline().strip()
+        port = int(config_fd.readline().strip())
+else:
+    token = args.token
+    db_path = args.dbpath
+    local_host = args.localhost
+    port = args.port
+
 laude_plus = 0  # TODO: make this customizable
 
 librettobot = Bot(token=token, database_url=db_path)

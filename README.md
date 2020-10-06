@@ -1,6 +1,6 @@
 # librettobot
 
-# Usage
+## Simple usage
 1. Make a `config.txt` file (it is recommendable in a `data` folder),
 with the following content, one item per line:
   - the token of the bot
@@ -29,3 +29,23 @@ with the following content, one item per line:
   ```bash
   make [config=path/to/config.txt] [run]
   ```
+
+## Usage with docker
+1. Create a `.env` file with the same content as above, but with
+the following format:
+```
+TELEGRAM_BOT_TOKEN=123456789:abcdefghi...helloworld
+DB_PATH=data/botdatabase.db
+LOCALHOST_IP=127.0.0.1
+PORT=5555
+```
+If different from the default `.env`, add the filename to `.git/info/exclude`.
+
+2. Build the docker container
+```
+docker build -t librettobot:myversion librettobot
+```
+3. Run the container specifying the environment file:
+```
+docker run --env-file <path/to/.env> librettobot:myversion
+```

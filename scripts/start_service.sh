@@ -1,9 +1,7 @@
 #!/bin/bash
 
-cat<<EOT | pipenv run python librettobot.py
-${TELEGRAM_BOT_TOKEN}
-/data/botdatabase.db
-0.0.0.0
-5555
-EOT
-
+pipenv run python librettobot.py \
+  --token ${TELEGRAM_BOT_TOKEN} \
+  --dbpath ${DB_PATH} \
+  --localhost ${LOCALHOST_IP} \
+  --port ${PORT}
