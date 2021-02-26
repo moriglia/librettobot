@@ -9,6 +9,3 @@ verify_ssl = true
 davtelepot = "*"
 dataset = "*"
 datetime = "*"
-
-[requires]
-python_version = "3.6"
